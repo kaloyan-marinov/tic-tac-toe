@@ -1,3 +1,4 @@
+import Koa from "koa";
 import Router from "koa-router";
 import { getConnection, Repository } from "typeorm";
 import { connectionName, INITIAL_STATE_FOR_GAME } from "./constants";
@@ -72,7 +73,7 @@ router.post("/api/games", usernameAuth, async (ctx) => {
   };
 });
 
-router.put("/api/games", usernameAuth, async (ctx) => {
+router.put("/api/games", usernameAuth, async (ctx: Koa.Context) => {
   const gamesRepository: Repository<Game> =
     getConnection(connectionName).getRepository(Game);
 
