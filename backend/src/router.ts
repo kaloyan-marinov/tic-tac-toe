@@ -104,7 +104,10 @@ router.put("/api/games", usernameAuth, async (ctx) => {
   }
 
   const gameState = JSON.parse(g.state as string); // TODO: fix the entity!
-  gameState[x][y] = "marked";
+  gameState[x][y] = {
+    turn: 0,
+    username: ctx.username,
+  };
   g.state = JSON.stringify(gameState);
   await gamesRepository.save(g);
 
