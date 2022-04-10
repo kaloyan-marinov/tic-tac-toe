@@ -29,7 +29,7 @@ export const Button = ({ x, y }: { x: number; y: number }) => {
   return (
     <button
       onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleClick(e)}
-      disabled={content !== EMPTY_CONTENT}
+      disabled={game.winner !== null || content !== EMPTY_CONTENT}
     >
       {content}
     </button>

@@ -753,7 +753,7 @@ export const editGame = (
 /* authSlice - reducer */
 export const gameReducer = (
   stateGame: IStateGame = initialStateGame,
-  action: ActionFetchGame | ActionCreateGame
+  action: ActionFetchGame | ActionCreateGame | ActionEditGame
   // | IActionClearAuthSlice
 ): IStateGame => {
   switch (action.type) {
@@ -808,6 +808,33 @@ export const gameReducer = (
         id: game.id,
         state: game.state,
         winner: null,
+      };
+    }
+
+    case ActionTypesEditGame.PENDING:
+      return {
+        ...stateGame,
+        requestStatus: RequestStatus.LOADING,
+        requestError: null,
+      };
+
+    case ActionTypesEditGame.REJECTED:
+      return {
+        ...stateGame,
+        requestStatus: RequestStatus.FAILED,
+        requestError: action.error,
+      };
+
+    case ActionTypesEditGame.FULFILLED: {
+      const game: IGame = action.payload.game;
+
+      return {
+        ...stateGame,
+        requestStatus: RequestStatus.SUCCEEDED,
+        requestError: null,
+        id: game.id,
+        state: game.state,
+        winner: game.winner,
       };
     }
 
