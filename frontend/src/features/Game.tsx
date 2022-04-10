@@ -9,14 +9,18 @@ import {
   alertsCreate,
   createGame,
   fetchGame,
-  IGame,
+  // IGame,
   IState,
-  selectGame,
+  selectGameId,
+  // selectGameState,
+  selectGameWinner,
 } from "../types";
 import { Button } from "./Button";
 
 export const Game = () => {
-  const game: IGame = useSelector(selectGame);
+  const gameId = useSelector(selectGameId);
+  // const gameState = useSelector(selectGameState);
+  const gameWinner = useSelector(selectGameWinner);
 
   // const dispatch: ThunkDispatch<IState, unknown, IActionClearAuthSlice | ActionAlerts> =
   const dispatch: ThunkDispatch<IState, unknown, ActionAlerts> = useDispatch();
@@ -31,19 +35,22 @@ export const Game = () => {
     const effectFn = async () => {
       console.log("    <Game>'s useEffect hook is dispatching fetchGame()");
 
-      try {
-        await dispatch(fetchGame());
-      } catch (err) {
-        const id: string = uuidv4();
+      if (gameWinner === null) {
+        console.log(gameWinner);
+        try {
+          await dispatch(fetchGame());
+        } catch (err) {
+          const id: string = uuidv4();
 
-        let message: string;
-        if (axios.isAxiosError(err) && err.response) {
-          message = err.response.data.error || ERROR_NOT_FROM_BACKEND;
-        } else {
-          message = err as string;
+          let message: string;
+          if (axios.isAxiosError(err) && err.response) {
+            message = err.response.data.error || ERROR_NOT_FROM_BACKEND;
+          } else {
+            message = err as string;
+          }
+
+          dispatch(alertsCreate(id, message));
         }
-
-        dispatch(alertsCreate(id, message));
       }
     };
 
@@ -70,7 +77,7 @@ export const Game = () => {
     }
   };
 
-  if (game.id === -1) {
+  if (gameId === -1) {
     return (
       <React.Fragment>
         <button onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleClick(e)}>
@@ -80,11 +87,11 @@ export const Game = () => {
     );
   }
 
-  if (game.winner !== null) {
+  if (gameWinner !== null) {
     const alertId: string = uuidv4();
 
     try {
-      dispatch(alertsCreate(alertId, `${game.winner} has won this game!`));
+      dispatch(alertsCreate(alertId, `${gameWinner} has won this game!`));
     } catch (err) {
       dispatch(alertsCreate(alertId, err as string));
     }

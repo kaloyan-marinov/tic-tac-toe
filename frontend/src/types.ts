@@ -871,4 +871,6 @@ export const selectHasValidToken = (state: IState) => state.auth.hasValidToken;
 export const selectSignedInUserProfile = (state: IState) =>
   state.auth.signedInUserProfile;
 
-export const selectGame = (state: IState) => state.game;
+export const selectGameId = (state: IState) => state.game.id;
+export const selectGameState = (state: IState) => state.game.state;
+export const selectGameWinner = (state: IState) => state.game.winner;
