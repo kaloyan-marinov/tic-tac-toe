@@ -22,12 +22,12 @@ export const Button = ({ x, y }: { x: number; y: number }) => {
 
     try {
       await dispatch(editGame(x, y));
-      await dispatch(
-        alertsCreate(
-          alertId,
-          "You have played your turn; it's your opponent's turn now."
-        )
-      );
+      // await dispatch(
+      //   alertsCreate(
+      //     alertId,
+      //     "You have played your turn; it's your opponent's turn now."
+      //   )
+      // );
     } catch (err) {
       dispatch(alertsCreate(alertId, err as string));
     }

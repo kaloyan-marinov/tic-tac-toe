@@ -49,7 +49,9 @@ export const Game = () => {
             message = err as string;
           }
 
-          dispatch(alertsCreate(id, message));
+          if (message !== "You aren't currently playing a game") {
+            dispatch(alertsCreate(id, message));
+          }
         }
       }
     };
