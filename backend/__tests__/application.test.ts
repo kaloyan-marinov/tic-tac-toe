@@ -4,7 +4,11 @@ import request from "supertest";
 import { Connection, createConnection } from "typeorm";
 
 import { app } from "../src/application";
-import { connectionName, PORT_FOR_TESTING } from "../src/constants";
+import {
+  connectionName,
+  INITIAL_STATE_FOR_GAME,
+  PORT_FOR_TESTING,
+} from "../src/constants";
 
 let connection: Connection;
 let server: http.Server;
@@ -83,6 +87,19 @@ describe("POST /api/users", () => {
     expect(response.type).toEqual("application/json");
     expect(response.body).toEqual({
       id: 1,
+    });
+  });
+});
+
+describe("POST /api/games", () => {
+  test("should return 201", async () => {
+    const response = await request(server).post("/api/games");
+
+    expect(response.status).toEqual(201);
+    expect(response.type).toEqual("application/json");
+    expect(response.body).toEqual({
+      id: 1,
+      state: INITIAL_STATE_FOR_GAME,
     });
   });
 });
