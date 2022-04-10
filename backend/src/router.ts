@@ -23,6 +23,16 @@ router.post("/api/users", async (ctx) => {
   const usersRepository: Repository<User> =
     getConnection(connectionName).getRepository(User);
 
+  // TEMPORARILY AND FOR THE SAKE OF SIMPLICITY: allow only 2 clients.
+  const users: User[] = await usersRepository.find();
+  if (users.length === 2) {
+    ctx.status = 400;
+    ctx.body = {
+      msg: "TEMPORARILY AND FOR THE SAKE OF SIMPLICITY: allow only 2 clients.",
+    };
+    return;
+  }
+
   let duplicateUser: User | undefined;
   duplicateUser = await usersRepository.findOne({ username });
   if (duplicateUser !== undefined) {
