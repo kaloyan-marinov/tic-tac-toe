@@ -53,7 +53,21 @@ export const initialStateAuth: IStateAuth = {
   signedInUserProfile: null,
 };
 
-export const initialStateGame = {
+export interface IGame {
+  id: number;
+  state: any;
+  winner: string | null;
+}
+
+export interface IStateGame {
+  requestStatus: RequestStatus;
+  requestError: string | null;
+  id: number;
+  state: any;
+  winner: string | null;
+}
+
+export const initialStateGame: IStateGame = {
   requestStatus: RequestStatus.IDLE,
   requestError: null,
   id: -1,
@@ -64,7 +78,7 @@ export const initialStateGame = {
 export interface IState {
   alerts: IStateAlerts;
   auth: IStateAuth;
-  game: any;
+  game: IStateGame;
 }
 
 /* alertsSlice - "alerts/" action creators */
@@ -499,6 +513,50 @@ export const authReducer = (
   }
 };
 
+/* gameSlice: "game/fetchGame" action creators */
+enum ActionTypesFetchGame {
+  PENDING = "game/fetchGame/pending",
+  REJECTED = "game/fetchGame/rejected",
+  FULFILLED = "game/fetchGame/fulfilled",
+}
+
+interface IActionFetchGamePending {
+  type: typeof ActionTypesFetchGame.PENDING;
+}
+
+interface IActionFetchGameRejected {
+  type: typeof ActionTypesFetchGame.REJECTED;
+  error: string;
+}
+
+interface IActionFetchGameFulfilled {
+  type: typeof ActionTypesFetchGame.FULFILLED;
+  payload: {
+    game: IGame;
+  };
+}
+
+export const fetchGamePending = (): IActionFetchGamePending => ({
+  type: ActionTypesFetchGame.PENDING,
+});
+
+export const fetchGameRejected = (error: string): IActionFetchGameRejected => ({
+  type: ActionTypesFetchGame.REJECTED,
+  error,
+});
+
+export const fetchGameFulfilled = (game: IGame): IActionFetchGameFulfilled => ({
+  type: ActionTypesFetchGame.FULFILLED,
+  payload: {
+    game,
+  },
+});
+
+export type ActionFetchGame =
+  | IActionFetchGamePending
+  | IActionFetchGameRejected
+  | IActionFetchGameFulfilled;
+
 /*
 Define a root reducer function,
 which serves to instantiate a single Redux store.
@@ -508,7 +566,7 @@ global state.)
 export const rootReducer = combineReducers({
   alerts: alertsReducer,
   auth: authReducer,
-  // entries: gameReducer,
+  game: gameReducer,
 });
 
 const composedEnhancer = composeWithDevTools(
@@ -526,3 +584,5 @@ export const selectAuthRequestStatus = (state: IState) => state.auth.requestStat
 export const selectHasValidToken = (state: IState) => state.auth.hasValidToken;
 export const selectSignedInUserProfile = (state: IState) =>
   state.auth.signedInUserProfile;
+
+export const selectGame = (state: IState) => state.game;
