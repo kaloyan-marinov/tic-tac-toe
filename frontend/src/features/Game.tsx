@@ -43,9 +43,17 @@ export const Game = () => {
 
         let message: string;
         if (axios.isAxiosError(err) && err.response) {
+          /*
+          console.log("1");
+          */
           message = err.response.data.error || ERROR_NOT_FROM_BACKEND;
         } else {
-          message = ERROR_NOT_FROM_BACKEND;
+          /*
+          console.log("2");
+          console.log(err);
+          */
+          // message = ERROR_NOT_FROM_BACKEND;
+          message = err as string;
         }
 
         dispatch(alertsCreate(id, message));
@@ -54,6 +62,14 @@ export const Game = () => {
 
     effectFn();
   }, [dispatch]);
+
+  if (game.id === -1) {
+    return (
+      <React.Fragment>
+        <button>Start a new game</button>
+      </React.Fragment>
+    );
+  }
 
   return (
     <React.Fragment>

@@ -24,6 +24,7 @@ function App() {
           </Route>
         </Switch>
       </div>
+      <hr />
       <Alerts />
     </React.Fragment>
   );
