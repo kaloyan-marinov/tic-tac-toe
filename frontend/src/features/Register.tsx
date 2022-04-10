@@ -1,4 +1,5 @@
 import React from "react";
+import { Redirect } from "react-router-dom";
 import { RequestStatus } from "../constants";
 
 export const Register = () => {
@@ -11,7 +12,8 @@ export const Register = () => {
 
   React.useEffect(() => {
     if (username !== "") {
-      console.log("running fetch");
+      setStatus(RequestStatus.LOADING);
+
       fetch("/api/users", {
         method: "post",
         headers: {
@@ -23,11 +25,21 @@ export const Register = () => {
           username,
         }),
       })
-        .then((r) => r.json())
+        .then((r) => {
+          setStatus(r.ok === true ? RequestStatus.SUCCEEDED : RequestStatus.FAILED);
+          return r.json();
+        })
         .then((data) => console.log(data))
-        .catch((err) => console.error(err));
+        .catch((err) => {
+          setStatus(RequestStatus.FAILED);
+          console.error(err);
+        });
     }
   }, [submitted]);
+
+  if (status === RequestStatus.FAILED) {
+    setSubmitted(false);
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
@@ -51,8 +63,17 @@ export const Register = () => {
             onChange={(e) => handleChange(e)}
           />
         </div>
-        <input type="submit" value="Register" />
+        <input
+          type="submit"
+          value="Register"
+          disabled={status === RequestStatus.LOADING}
+        />
       </form>
+      {status === RequestStatus.SUCCEEDED ? (
+        <div>Registration successful. Please log in.</div>
+      ) : (
+        <div></div>
+      )}
     </>
   );
 };
