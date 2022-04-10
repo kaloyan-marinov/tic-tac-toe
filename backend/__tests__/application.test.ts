@@ -18,30 +18,30 @@ afterEach(() => {
   server.close();
 });
 
-test("GET /", async () => {
-  const response = await request(server).get("/");
+test("GET /api/health-check", async () => {
+  const response = await request(server).get("/api/health-check");
 
   expect(response.status).toEqual(200);
   expect(response.type).toEqual("application/json");
   expect(response.body).toEqual({
-    msg: "Hello World!",
+    "health-check": "passed",
   });
 });
 
-describe("POST /", () => {
+describe("POST /api/users", () => {
   test("should return 400", async () => {
-    const response = await request(server).post("/");
+    const response = await request(server).post("/api/users");
 
     expect(response.status).toEqual(400);
     expect(response.type).toEqual("application/json");
     expect(response.body).toEqual({
-      error: "The body of your request has to specify a value for 'name'",
+      error: "The body of your request has to specify a value for 'username'",
     });
   });
 
   test("should return 200", async () => {
-    const response = await request(server).post("/").send({
-      name: "John Doe",
+    const response = await request(server).post("/api/users").send({
+      username: "John Doe",
     });
 
     expect(response.status).toEqual(200);

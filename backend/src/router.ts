@@ -2,22 +2,22 @@ import Router from "koa-router";
 
 const router = new Router();
 
-router.get("/", (ctx) => {
-  ctx.body = { msg: "Hello World!" };
+router.get("/api/health-check", (ctx) => {
+  ctx.body = { "health-check": "passed" };
 });
 
-router.post("/", (ctx) => {
-  if (!ctx.request.body.hasOwnProperty("name")) {
+router.post("/api/users", (ctx) => {
+  if (!ctx.request.body.hasOwnProperty("username")) {
     ctx.status = 400;
     ctx.body = {
-      error: "The body of your request has to specify a value for 'name'",
+      error: "The body of your request has to specify a value for 'username'",
     };
     return;
   }
 
-  const { name } = ctx.request.body;
+  const { username } = ctx.request.body;
   ctx.body = {
-    msg: `Hello, ${name}!`,
+    msg: `Hello, ${username}!`,
   };
 });
 
