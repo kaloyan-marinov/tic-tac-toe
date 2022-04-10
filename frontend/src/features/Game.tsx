@@ -12,6 +12,7 @@ import {
   IState,
   selectGame,
 } from "../types";
+import { Button } from "./Button";
 
 export const Game = () => {
   console.log(
@@ -60,35 +61,35 @@ export const Game = () => {
         <tbody>
           <tr>
             <td>
-              <button>0, 0</button>
+              <Button x={0} y={0} />
             </td>
             <td>
-              <button>0, 1</button>
+              <Button x={0} y={1} />
             </td>
             <td>
-              <button>0, 2</button>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <button>1, 0</button>
-            </td>
-            <td>
-              <button>1, 1</button>
-            </td>
-            <td>
-              <button>1, 2</button>
+              <Button x={0} y={2} />
             </td>
           </tr>
           <tr>
             <td>
-              <button>2, 0</button>
+              <Button x={1} y={0} />
             </td>
             <td>
-              <button>2, 1</button>
+              <Button x={1} y={1} />
             </td>
             <td>
-              <button>2, 2</button>
+              <Button x={1} y={2} />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <Button x={2} y={0} />
+            </td>
+            <td>
+              <Button x={2} y={1} />
+            </td>
+            <td>
+              <Button x={2} y={2} />
             </td>
           </tr>
         </tbody>
