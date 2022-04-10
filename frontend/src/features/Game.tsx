@@ -26,17 +26,16 @@ export const Game = () => {
   const dispatch: ThunkDispatch<IState, unknown, ActionAlerts> = useDispatch();
 
   React.useEffect(() => {
-    console.log(
-      `${new Date().toISOString()}` +
-        ` - ${__filename}` +
-        ` - React is running <Game>'s useEffect hook`
-    );
-
     const effectFn = async () => {
-      console.log("    <Game>'s useEffect hook is dispatching fetchGame()");
+      console.log(
+        `${new Date().toISOString()}` +
+          ` - ${__filename}` +
+          ` - React is running <Game>'s useEffect hook`
+      );
 
       if (gameWinner === null) {
-        console.log(gameWinner);
+        console.log("    <Game>'s useEffect hook is dispatching fetchGame()");
+
         try {
           await dispatch(fetchGame());
         } catch (err) {
@@ -57,7 +56,7 @@ export const Game = () => {
     };
 
     const interval: NodeJS.Timer = setInterval(() => {
-      console.log(`${new Date().toISOString()} - logs every second`);
+      // console.log(`${new Date().toISOString()} - logs every second`);
       effectFn();
     }, MILLISECONDS_EQUAL_TO_1_MIN);
 
@@ -89,15 +88,15 @@ export const Game = () => {
     );
   }
 
-  if (gameWinner !== null) {
-    const alertId: string = uuidv4();
+  // if () {
+  //   const alertId: string = uuidv4();
 
-    try {
-      dispatch(alertsCreate(alertId, `${gameWinner} has won this game!`));
-    } catch (err) {
-      dispatch(alertsCreate(alertId, err as string));
-    }
-  }
+  //   try {
+  //     dispatch(alertsCreate(alertId, ));
+  //   } catch (err) {
+  //     dispatch(alertsCreate(alertId, err as string));
+  //   }
+  // }
 
   return (
     <React.Fragment>
@@ -138,6 +137,12 @@ export const Game = () => {
           </tr>
         </tbody>
       </table>
+      {gameWinner !== null && (
+        <div>
+          <p>{`${gameWinner} has won this game!`}</p>
+          <button>Leave this game</button>
+        </div>
+      )}
     </React.Fragment>
   );
 };
