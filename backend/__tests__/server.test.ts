@@ -27,3 +27,27 @@ test("GET /", async () => {
     msg: "Hello World!",
   });
 });
+
+describe("POST /", () => {
+  test("should return 400", async () => {
+    const response = await request(server).post("/");
+
+    expect(response.status).toEqual(400);
+    expect(response.type).toEqual("application/json");
+    expect(response.body).toEqual({
+      error: "The body of your request has to specify a value for 'name'",
+    });
+  });
+
+  test("should return 200", async () => {
+    const response = await request(server).post("/").send({
+      name: "John Doe",
+    });
+
+    expect(response.status).toEqual(200);
+    expect(response.type).toEqual("application/json");
+    expect(response.body).toEqual({
+      msg: "Hello, John Doe!",
+    });
+  });
+});
