@@ -98,7 +98,7 @@ describe("POST /api/games", () => {
     expect(response.status).toEqual(401);
     expect(response.type).toEqual("application/json");
     expect(response.body).toEqual({
-      error: "authentication required - provide a 'username' in the request body",
+      error: "authentication required - via Bearer token",
     });
   });
 
@@ -109,7 +109,8 @@ describe("POST /api/games", () => {
 
     const response2 = await request(server)
       .post("/api/games")
-      .send({ username: "john-doe" });
+      .send({ username: "john-doe" })
+      .set("Authorization", "Bearer " + "john-doe");
 
     expect(response2.status).toEqual(201);
     expect(response2.type).toEqual("application/json");
