@@ -650,8 +650,6 @@ export const createGame = (): ThunkAction<
       },
     };
 
-    console.log(config);
-
     dispatch(createGamePending());
     try {
       const response = await axios.post("/api/games", body, config);
@@ -663,6 +661,87 @@ export const createGame = (): ThunkAction<
         const responseBodyError =
           responseBody.error || responseBody.msg || ERROR_NOT_FROM_BACKEND;
         dispatch(createGameRejected(responseBodyError));
+        return Promise.reject(responseBodyError);
+      }
+
+      return Promise.reject(ERROR_NOT_FROM_BACKEND);
+    }
+  };
+};
+
+/* gameSlice - "game/editGame" action creators */
+enum ActionTypesEditGame {
+  PENDING = "game/editGame/pending",
+  REJECTED = "game/editGame/rejected",
+  FULFILLED = "game/editGame/fulfilled",
+}
+
+interface IActionEditGamePending {
+  type: typeof ActionTypesEditGame.PENDING;
+}
+
+interface IActionEditGameRejected {
+  type: typeof ActionTypesEditGame.REJECTED;
+  error: string;
+}
+
+interface IActionEditGameFulfilled {
+  type: typeof ActionTypesEditGame.FULFILLED;
+  payload: {
+    game: IGame;
+  };
+}
+
+export const editGamePending = (): IActionEditGamePending => ({
+  type: ActionTypesEditGame.PENDING,
+});
+
+export const editGameRejected = (error: string): IActionEditGameRejected => ({
+  type: ActionTypesEditGame.REJECTED,
+  error,
+});
+
+export const editGameFulfilled = (game: IGame): IActionEditGameFulfilled => ({
+  type: ActionTypesEditGame.FULFILLED,
+  payload: {
+    game,
+  },
+});
+
+export type ActionEditGame =
+  | IActionEditGamePending
+  | IActionEditGameRejected
+  | IActionEditGameFulfilled;
+
+/* gameSlice - "game/editGame" thunk-action creator */
+export const editGame = (
+  x: number,
+  y: number
+): ThunkAction<Promise<any>, IState, unknown, ActionEditGame> => {
+  return async (dispatch) => {
+    const body = JSON.stringify({
+      x,
+      y,
+    });
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem(NAME_OF_ACCESS_TOKEN),
+      },
+    };
+
+    dispatch(editGamePending());
+    try {
+      const response = await axios.put("/api/games", body, config);
+      dispatch(editGameFulfilled(response.data));
+      return Promise.resolve();
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        const responseBody = err.response.data;
+        const responseBodyError =
+          responseBody.error || responseBody.msg || ERROR_NOT_FROM_BACKEND;
+        dispatch(editGameRejected(responseBodyError));
         return Promise.reject(responseBodyError);
       }
 

@@ -16,13 +16,7 @@ import {
 import { Button } from "./Button";
 
 export const Game = () => {
-  console.log(
-    `${new Date().toISOString()} - ${__filename}` + ` - React is rendering <Game>`
-  );
-
   const game: IGame = useSelector(selectGame);
-  console.log("    game:");
-  console.log(`    ${JSON.stringify(game)}`);
 
   // const dispatch: ThunkDispatch<IState, unknown, IActionClearAuthSlice | ActionAlerts> =
   const dispatch: ThunkDispatch<IState, unknown, ActionAlerts> = useDispatch();
@@ -35,7 +29,7 @@ export const Game = () => {
     );
 
     const effectFn = async () => {
-      console.log("    <Game>'s useEffect hook is dispatching fetchEntries()");
+      console.log("    <Game>'s useEffect hook is dispatching fetchGame()");
 
       try {
         await dispatch(fetchGame());
@@ -44,16 +38,8 @@ export const Game = () => {
 
         let message: string;
         if (axios.isAxiosError(err) && err.response) {
-          /*
-          console.log("1");
-          */
           message = err.response.data.error || ERROR_NOT_FROM_BACKEND;
         } else {
-          /*
-          console.log("2");
-          console.log(err);
-          */
-          // message = ERROR_NOT_FROM_BACKEND;
           message = err as string;
         }
 
