@@ -1,13 +1,11 @@
 import Koa from "koa";
-import Router from "koa-router";
+import logger from "koa-logger";
+
+import { router } from "./router";
 
 const app = new Koa();
 
-const router = new Router();
-
-router.get("/", (ctx) => {
-  ctx.body = { msg: "Hello World!" };
-});
+app.use(logger());
 
 app.use(router.allowedMethods());
 app.use(router.routes());
