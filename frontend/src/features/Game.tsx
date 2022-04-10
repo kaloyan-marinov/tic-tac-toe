@@ -71,6 +71,16 @@ export const Game = () => {
     );
   }
 
+  if (game.winner !== null) {
+    const alertId: string = uuidv4();
+
+    try {
+      dispatch(alertsCreate(alertId, `${game.winner} has won this game!`));
+    } catch (err) {
+      dispatch(alertsCreate(alertId, err as string));
+    }
+  }
+
   return (
     <React.Fragment>
       <table>
