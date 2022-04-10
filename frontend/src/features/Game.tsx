@@ -3,7 +3,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
 import { v4 as uuidv4 } from "uuid";
-import { ERROR_NOT_FROM_BACKEND } from "../constants";
+import { ERROR_NOT_FROM_BACKEND, MILLISECONDS_EQUAL_TO_1_MIN } from "../constants";
 import {
   ActionAlerts,
   alertsCreate,
@@ -47,7 +47,16 @@ export const Game = () => {
       }
     };
 
-    effectFn();
+    const interval: NodeJS.Timer = setInterval(() => {
+      console.log(`${new Date().toISOString()} - logs every second`);
+      effectFn();
+    }, MILLISECONDS_EQUAL_TO_1_MIN);
+
+    // effectFn();
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [dispatch]);
 
   const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
