@@ -4,7 +4,8 @@ import { getConnection, Repository } from "typeorm";
 import { connectionName, INITIAL_STATE_FOR_GAME } from "./constants";
 import { Game, User } from "./entities";
 import { usernameAuth } from "./middleware";
-import { validateCoordinate } from "./utilities";
+import { IMove } from "./types";
+import { computeMoveIdx, validateCoordinate } from "./utilities";
 
 const router = new Router();
 
@@ -94,19 +95,27 @@ router.put("/api/games", usernameAuth, async (ctx: Koa.Context) => {
     return;
   }
 
-  const { x, y } = ctx.request.body;
+  const gameState = JSON.parse(g.state as string); // TODO: fix the entity!
 
-  if (!validateCoordinate(x) || !validateCoordinate(y)) {
+  // Check whether the attempted move is a valid one.
+  const move: IMove = {
+    x: ctx.request.body.x,
+    y: ctx.request.body.y,
+    username: ctx.username,
+  };
+  const moveIdx: number = computeMoveIdx(gameState, move);
+
+  if (moveIdx === -1) {
     ctx.status = 400;
     ctx.body = {
-      error: "Each of 'x' and 'y' has to be set equal to 0, 1, or 2",
+      error: `The move ${JSON.stringify(move)} is invalid!`,
     };
     return;
   }
 
-  const gameState = JSON.parse(g.state as string); // TODO: fix the entity!
-  gameState[x][y] = {
-    turn: 0,
+  // The attempted move has been validated, so go on to actually perform it.
+  gameState[move.x][move.y] = {
+    moveIdx: moveIdx,
     username: ctx.username,
   };
   g.state = JSON.stringify(gameState);
