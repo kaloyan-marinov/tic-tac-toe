@@ -1,18 +1,9 @@
-import Koa from "koa";
-import Router from "koa-router";
+import http from "http";
 
-const app = new Koa();
+import { app } from "./application";
 
-const router = new Router();
+const server: http.Server = http.createServer(app.callback());
 
-router.get("/", (ctx) => {
-  ctx.body = { msg: "Hello World!" };
-});
-
-app.use(router.allowedMethods());
-
-app.use(router.routes());
-
-app.listen(3000, () => {
+server.listen(3000, () => {
   console.log(`Server listening on port 3000`);
 });
