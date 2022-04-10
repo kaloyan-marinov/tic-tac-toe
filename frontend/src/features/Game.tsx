@@ -54,5 +54,45 @@ export const Game = () => {
     effectFn();
   }, [dispatch]);
 
-  return <React.Fragment>{JSON.stringify(game)}</React.Fragment>;
+  return (
+    <React.Fragment>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <button>0, 0</button>
+            </td>
+            <td>
+              <button>0, 1</button>
+            </td>
+            <td>
+              <button>0, 2</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button>1, 0</button>
+            </td>
+            <td>
+              <button>1, 1</button>
+            </td>
+            <td>
+              <button>1, 2</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button>2, 0</button>
+            </td>
+            <td>
+              <button>2, 1</button>
+            </td>
+            <td>
+              <button>2, 2</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </React.Fragment>
+  );
 };
