@@ -7,6 +7,7 @@ import { ERROR_NOT_FROM_BACKEND } from "../constants";
 import {
   ActionAlerts,
   alertsCreate,
+  createGame,
   fetchGame,
   IGame,
   IState,
@@ -63,10 +64,23 @@ export const Game = () => {
     effectFn();
   }, [dispatch]);
 
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const alertId: string = uuidv4();
+
+    try {
+      await dispatch(createGame());
+      await dispatch(alertsCreate(alertId, "You have started a new game"));
+    } catch (err) {
+      dispatch(alertsCreate(alertId, err as string));
+    }
+  };
+
   if (game.id === -1) {
     return (
       <React.Fragment>
-        <button>Start a new game</button>
+        <button onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleClick(e)}>
+          Start a new game
+        </button>
       </React.Fragment>
     );
   }

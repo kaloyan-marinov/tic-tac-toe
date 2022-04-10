@@ -590,10 +590,91 @@ export const fetchGame = (): ThunkAction<
   };
 };
 
+/* gameSlice - "game/createGame" action creators */
+enum ActionTypesCreateGame {
+  PENDING = "game/createGame/pending",
+  REJECTED = "game/createGame/rejected",
+  FULFILLED = "game/createGame/fulfilled",
+}
+
+interface IActionCreateGamePending {
+  type: typeof ActionTypesCreateGame.PENDING;
+}
+
+interface IActionCreateGameRejected {
+  type: typeof ActionTypesCreateGame.REJECTED;
+  error: string;
+}
+
+interface IActionCreateGameFulfilled {
+  type: typeof ActionTypesCreateGame.FULFILLED;
+  payload: {
+    game: IGame;
+  };
+}
+
+export const createGamePending = (): IActionCreateGamePending => ({
+  type: ActionTypesCreateGame.PENDING,
+});
+
+export const createGameRejected = (error: string): IActionCreateGameRejected => ({
+  type: ActionTypesCreateGame.REJECTED,
+  error,
+});
+
+export const createGameFulfilled = (game: IGame): IActionCreateGameFulfilled => ({
+  type: ActionTypesCreateGame.FULFILLED,
+  payload: {
+    game,
+  },
+});
+
+export type ActionCreateGame =
+  | IActionCreateGamePending
+  | IActionCreateGameRejected
+  | IActionCreateGameFulfilled;
+
+/* gameSlice - "game/createGame" thunk-action creator */
+export const createGame = (): ThunkAction<
+  Promise<any>,
+  IState,
+  unknown,
+  ActionCreateGame
+> => {
+  return async (dispatch) => {
+    const body = JSON.stringify({});
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem(NAME_OF_ACCESS_TOKEN),
+      },
+    };
+
+    console.log(config);
+
+    dispatch(createGamePending());
+    try {
+      const response = await axios.post("/api/games", body, config);
+      dispatch(createGameFulfilled(response.data));
+      return Promise.resolve();
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        const responseBody = err.response.data;
+        const responseBodyError =
+          responseBody.error || responseBody.msg || ERROR_NOT_FROM_BACKEND;
+        dispatch(createGameRejected(responseBodyError));
+        return Promise.reject(responseBodyError);
+      }
+
+      return Promise.reject(ERROR_NOT_FROM_BACKEND);
+    }
+  };
+};
+
 /* authSlice - reducer */
 export const gameReducer = (
   stateGame: IStateGame = initialStateGame,
-  action: ActionFetchGame
+  action: ActionFetchGame | ActionCreateGame
   // | IActionClearAuthSlice
 ): IStateGame => {
   switch (action.type) {
@@ -621,6 +702,33 @@ export const gameReducer = (
         id: game.id,
         state: game.state,
         winner: game.winner,
+      };
+    }
+
+    case ActionTypesCreateGame.PENDING:
+      return {
+        ...stateGame,
+        requestStatus: RequestStatus.LOADING,
+        requestError: null,
+      };
+
+    case ActionTypesCreateGame.REJECTED:
+      return {
+        ...stateGame,
+        requestStatus: RequestStatus.FAILED,
+        requestError: action.error,
+      };
+
+    case ActionTypesCreateGame.FULFILLED: {
+      const game: IGame = action.payload.game;
+
+      return {
+        ...stateGame,
+        requestStatus: RequestStatus.SUCCEEDED,
+        requestError: null,
+        id: game.id,
+        state: game.state,
+        winner: null,
       };
     }
 
