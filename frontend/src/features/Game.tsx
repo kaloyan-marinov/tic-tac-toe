@@ -1,83 +1,58 @@
-import React from 'react';
+import axios from "axios";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { ThunkDispatch } from "redux-thunk";
 import { v4 as uuidv4 } from "uuid";
+import { ERROR_NOT_FROM_BACKEND } from "../constants";
+import {
+  ActionAlerts,
+  alertsCreate,
+  fetchGame,
+  IGame,
+  IState,
+  selectGame,
+} from "../types";
 
 export const Game = () => {
   console.log(
-    `${new Date().toISOString()} - ${__filename}` +
-      ` - React is rendering <MyMonthlyJournal>`
+    `${new Date().toISOString()} - ${__filename}` + ` - React is rendering <Game>`
   );
 
-  const entriesIds: number[] = useSelector(selectEntriesIds);
-  console.log("    entriesIds:");
-  console.log(`    ${JSON.stringify(entriesIds)}`);
+  const game: IGame = useSelector(selectGame);
+  console.log("    game:");
+  console.log(`    ${JSON.stringify(game)}`);
 
-  const entriesEntities: { [entryId: string]: IEntry } =
-    useSelector(selectEntriesEntities);
-  console.log("    entriesEntities:");
-  console.log(`    ${JSON.stringify(entriesEntities)}`);
-
-  const dispatch: ThunkDispatch<IState, unknown, IActionClearAuthSlice | ActionAlerts> =
-    useDispatch();
+  // const dispatch: ThunkDispatch<IState, unknown, IActionClearAuthSlice | ActionAlerts> =
+  const dispatch: ThunkDispatch<IState, unknown, ActionAlerts> = useDispatch();
 
   React.useEffect(() => {
     console.log(
       `${new Date().toISOString()}` +
         ` - ${__filename}` +
-        ` - React is running <MyMonthlyJournal>'s useEffect hook`
+        ` - React is running <Game>'s useEffect hook`
     );
 
     const effectFn = async () => {
-      console.log(
-        "    <MyMonthlyJournal>'s useEffect hook is dispatching fetchEntries()"
-      );
+      console.log("    <Game>'s useEffect hook is dispatching fetchEntries()");
 
       try {
-        await dispatch(fetchEntries());
+        await dispatch(fetchGame());
       } catch (err) {
-        if (err.response.status === 401) {
-          dispatch(
-            signOut("[FROM <MyMonthlyJournal>'S useEffect HOOK] PLEASE SIGN BACK IN")
-          );
+        const id: string = uuidv4();
+
+        let message: string;
+        if (axios.isAxiosError(err) && err.response) {
+          message = err.response.data.error || ERROR_NOT_FROM_BACKEND;
         } else {
-          const id: string = uuidv4();
-          const message: string =
-            err.response.data.error ||
-            "ERROR NOT FROM BACKEND BUT FROM FRONTEND COMPONENT";
-          dispatch(alertsCreate(id, message));
+          message = ERROR_NOT_FROM_BACKEND;
         }
+
+        dispatch(alertsCreate(id, message));
       }
     };
 
     effectFn();
   }, [dispatch]);
 
-  const entries = entriesIds.map((entryId: number) => {
-    const e: IEntry = entriesEntities[entryId];
-
-    return (
-      <div key={e.id}>
-        <hr />
-        <SingleEntry timestampInUTC={e.timestampInUTC} content={e.content} />
-        <ul>
-          <li>
-            <Link to={`/entries/${e.id}/edit`}>Edit</Link>
-          </li>
-          <li>
-            <DeleteEntryLink to={`/entries/${e.id}/delete`} />
-          </li>
-        </ul>
-      </div>
-    );
-  });
-
-  return (
-    <React.Fragment>
-      {"<MyMonthlyJournal>"}
-      <div>Review the entries in MyMonthlyJournal!</div>
-      <Link to="/entries/create">Create a new entry</Link>
-      {entries}
-    </React.Fragment>
-  );
-};
+  return <React.Fragment>{JSON.stringify(game)}</React.Fragment>;
 };

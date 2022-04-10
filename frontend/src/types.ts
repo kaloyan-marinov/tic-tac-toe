@@ -513,7 +513,7 @@ export const authReducer = (
   }
 };
 
-/* gameSlice: "game/fetchGame" action creators */
+/* gameSlice - "game/fetchGame" action creators */
 enum ActionTypesFetchGame {
   PENDING = "game/fetchGame/pending",
   REJECTED = "game/fetchGame/rejected",
@@ -556,6 +556,78 @@ export type ActionFetchGame =
   | IActionFetchGamePending
   | IActionFetchGameRejected
   | IActionFetchGameFulfilled;
+
+/* gameSlice - "game/fetchGame" thunk-action creator */
+export const fetchGame = (): ThunkAction<
+  Promise<any>,
+  IState,
+  unknown,
+  ActionFetchGame
+> => {
+  return async (dispatch) => {
+    const config = {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem(NAME_OF_ACCESS_TOKEN),
+      },
+    };
+
+    dispatch(fetchGamePending());
+    try {
+      const response = await axios.get("/api/games", config);
+      dispatch(fetchGameFulfilled(response.data));
+      return Promise.resolve();
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        const responseBody = err.response.data;
+        const responseBodyError =
+          responseBody.error || responseBody.msg || ERROR_NOT_FROM_BACKEND;
+        dispatch(fetchGameRejected(responseBodyError));
+        return Promise.reject(responseBodyError);
+      }
+
+      return Promise.reject(ERROR_NOT_FROM_BACKEND);
+    }
+  };
+};
+
+/* authSlice - reducer */
+export const gameReducer = (
+  stateGame: IStateGame = initialStateGame,
+  action: ActionFetchGame
+  // | IActionClearAuthSlice
+): IStateGame => {
+  switch (action.type) {
+    case ActionTypesFetchGame.PENDING:
+      return {
+        ...stateGame,
+        requestStatus: RequestStatus.LOADING,
+        requestError: null,
+      };
+
+    case ActionTypesFetchGame.REJECTED:
+      return {
+        ...stateGame,
+        requestStatus: RequestStatus.FAILED,
+        requestError: action.error,
+      };
+
+    case ActionTypesFetchGame.FULFILLED: {
+      const game: IGame = action.payload.game;
+
+      return {
+        ...stateGame,
+        requestStatus: RequestStatus.SUCCEEDED,
+        requestError: null,
+        id: game.id,
+        state: game.state,
+        winner: game.winner,
+      };
+    }
+
+    default:
+      return stateGame;
+  }
+};
 
 /*
 Define a root reducer function,
