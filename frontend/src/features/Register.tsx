@@ -1,54 +1,57 @@
 import React from "react";
 import { Redirect } from "react-router-dom";
-import { RequestStatus } from "../constants";
+import {
+  ActionAlerts,
+  ActionCreateUser,
+  alertsCreate,
+  createUser,
+  IState,
+  selectHasValidToken,
+} from "../types";
+import { v4 as uuidv4 } from "uuid";
+import { useDispatch, useSelector } from "react-redux";
+import { ThunkDispatch } from "redux-thunk";
 
 export const Register = () => {
   const [username, setUsername] = React.useState("");
-  const [submitted, setSubmitted] = React.useState<boolean>(false);
-  const [status, setStatus] = React.useState<RequestStatus>(RequestStatus.IDLE);
 
-  console.log("rendering <Register>");
-  console.log(submitted);
+  const hasValidToken: boolean | null = useSelector(selectHasValidToken);
+  console.log("    hasValidToken:");
+  console.log(`    ${hasValidToken}`);
 
-  React.useEffect(() => {
-    if (username !== "") {
-      setStatus(RequestStatus.LOADING);
+  const dispatch: ThunkDispatch<IState, unknown, ActionCreateUser | ActionAlerts> =
+    useDispatch();
 
-      fetch("/api/users", {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-        },
-
-        //make sure to serialize your JSON body
-        body: JSON.stringify({
-          username,
-        }),
-      })
-        .then((r) => {
-          setStatus(r.ok === true ? RequestStatus.SUCCEEDED : RequestStatus.FAILED);
-          return r.json();
-        })
-        .then((data) => console.log(data))
-        .catch((err) => {
-          setStatus(RequestStatus.FAILED);
-          console.error(err);
-        });
-    }
-  }, [submitted]);
-
-  if (status === RequestStatus.FAILED) {
-    setSubmitted(false);
+  if (hasValidToken === true) {
+    const nextURL: string = "/";
+    console.log(`    hasValidToken=${hasValidToken} > redirecting to ${nextURL} ...`);
+    return <Redirect to={nextURL} />;
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setSubmitted(true);
+    const id: string = uuidv4();
+    if (username === "") {
+      const message: string = "YOU MUST FILL OUT ALL FORM FIELDS";
+      dispatch(alertsCreate(id, message));
+    } else {
+      // Note to self:
+      // doing anything beyond simple `console.log` calls in this `else` clause
+      // should be postponed until
+      // after the logic within the `if` clause has been _properly_ implemented.
+      try {
+        await dispatch(createUser(username));
+
+        dispatch(alertsCreate(id, "REGISTRATION SUCCESSFUL"));
+      } catch (thunkActionError) {
+        dispatch(alertsCreate(id, thunkActionError));
+      }
+    }
   };
 
   return (
@@ -63,17 +66,8 @@ export const Register = () => {
             onChange={(e) => handleChange(e)}
           />
         </div>
-        <input
-          type="submit"
-          value="Register"
-          disabled={status === RequestStatus.LOADING}
-        />
+        <input type="submit" value="Register" />
       </form>
-      {status === RequestStatus.SUCCEEDED ? (
-        <div>Registration successful. Please log in.</div>
-      ) : (
-        <div></div>
-      )}
     </>
   );
 };

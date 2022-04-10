@@ -1,5 +1,6 @@
 import React from "react";
 import { Switch, Route } from "react-router-dom";
+import { Alerts } from "./features/Alerts";
 import { Game } from "./features/Game";
 import { Login } from "./features/Login";
 import { NavBar } from "./features/NavBar";
@@ -23,6 +24,7 @@ function App() {
           </Route>
         </Switch>
       </div>
+      <Alerts />
     </React.Fragment>
   );
 }
