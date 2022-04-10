@@ -8,7 +8,19 @@ export class User {
   @Column({
     unique: true,
     nullable: false,
-    length: 54,
+    length: 16,
   })
   username?: string;
+}
+
+@Entity({ name: "games" })
+export class Game {
+  @PrimaryGeneratedColumn()
+  id?: number;
+
+  @Column({
+    nullable: false,
+    length: 1024,
+  })
+  state?: string;
 }
