@@ -49,7 +49,7 @@ export const Register = () => {
 
         dispatch(alertsCreate(id, "REGISTRATION SUCCESSFUL"));
       } catch (thunkActionError) {
-        dispatch(alertsCreate(id, thunkActionError));
+        dispatch(alertsCreate(id, thunkActionError as string));
       }
     }
   };

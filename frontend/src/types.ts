@@ -4,6 +4,7 @@ import { Dispatch } from "redux";
 import { ThunkAction, ThunkDispatch } from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
 import thunkMiddleware from "redux-thunk";
+import { ERROR_NOT_FROM_BACKEND } from "./constants";
 
 export enum RequestStatus {
   IDLE = "idle",
@@ -217,11 +218,16 @@ export const createUser = (
       dispatch(createUserFulfilled());
       return Promise.resolve();
     } catch (err) {
-      const responseBody = err.response.data;
-      const responseBodyError =
-        responseBody.error || "ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION";
-      dispatch(createUserRejected(responseBodyError));
-      return Promise.reject(responseBodyError);
+      if (axios.isAxiosError(err) && err.response) {
+        // console.log(err);
+        const responseBody = err.response.data;
+        const responseBodyError =
+          responseBody.error || responseBody.msg || ERROR_NOT_FROM_BACKEND;
+        dispatch(createUserRejected(responseBodyError));
+        return Promise.reject(responseBodyError);
+      }
+
+      return Promise.reject(ERROR_NOT_FROM_BACKEND);
     }
   };
 };

@@ -1,1 +1,2 @@
-import { IStateAlerts } from "./types";
+export const ERROR_NOT_FROM_BACKEND =
+  "ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION";

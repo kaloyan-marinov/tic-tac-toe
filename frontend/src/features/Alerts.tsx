@@ -2,18 +2,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { alertsRemove, IAlert, selectAlertsEntities, selectAlertsIds } from "../types";
 
 export const Alerts = () => {
-  console.log(
-    `${new Date().toISOString()} - ${__filename} - React is rendering <Alerts>`
-  );
-
   const alertsIds: string[] = useSelector(selectAlertsIds);
-  console.log("    alertsIds:");
-  console.log(`    ${JSON.stringify(alertsIds)}`);
 
   const alertsEntities: { [alertId: string]: IAlert } =
     useSelector(selectAlertsEntities);
-  console.log("    alertsEntities:");
-  console.log(`    ${JSON.stringify(alertsEntities)}`);
 
   const dispatch = useDispatch();
 
@@ -23,8 +15,6 @@ export const Alerts = () => {
 
   return (
     <>
-      {"<Alerts>"}
-      <br />
       {alertsIds.length === 0 ? (
         <br />
       ) : (
