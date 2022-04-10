@@ -1,21 +1,40 @@
 import http from "http";
 
 import request from "supertest";
+import { Connection, createConnection } from "typeorm";
 
 import { app } from "../src/application";
+import { connectionName, PORT_FOR_TESTING } from "../src/constants";
 
+let connection: Connection;
 let server: http.Server;
 
-beforeEach(() => {
-  const port: number = 3001;
+beforeEach(async () => {
+  const dbConnectionPromise: Promise<Connection> = createConnection(connectionName);
+  connection = await dbConnectionPromise;
+  console.log(
+    `Establishing a connection (named ${connection.name}) to the DB - successful.`
+  );
+
+  try {
+    const dropBeforeSync = true;
+    await connection.synchronize(dropBeforeSync);
+    console.log("Synchronizing the DB schema - successful.");
+  } catch (err) {
+    console.error("Synchronizing the DB schema - failed.");
+    console.error(err);
+    throw err;
+  }
+
   server = http.createServer(app.callback());
-  server.listen(port, () => {
-    console.log(`Server listening on port ${port} ...`);
+  server.listen(PORT_FOR_TESTING, () => {
+    console.log(`Server listening on port ${PORT_FOR_TESTING} ...`);
   });
 });
 
-afterEach(() => {
+afterEach(async () => {
   server.close();
+  await connection.close();
 });
 
 test("GET /api/health-check", async () => {
@@ -29,7 +48,7 @@ test("GET /api/health-check", async () => {
 });
 
 describe("POST /api/users", () => {
-  test("should return 400", async () => {
+  test("if no 'username' is provided, should return 400", async () => {
     const response = await request(server).post("/api/users");
 
     expect(response.status).toEqual(400);
@@ -39,15 +58,31 @@ describe("POST /api/users", () => {
     });
   });
 
-  test("should return 200", async () => {
+  test("if a taken 'username' is provided, should return 400", async () => {
+    const response1 = await request(server).post("/api/users").send({
+      username: "John Doe",
+    });
+
+    const response2 = await request(server).post("/api/users").send({
+      username: "John Doe",
+    });
+    expect(response2.status).toEqual(400);
+    expect(response2.type).toEqual("application/json");
+    expect(response2.body).toEqual({
+      error: "Username is taken",
+    });
+  });
+
+  test("if a valid 'username' is provided, should return 201", async () => {
     const response = await request(server).post("/api/users").send({
       username: "John Doe",
     });
 
-    expect(response.status).toEqual(200);
+    expect(response.status).toEqual(201);
+    expect(response.headers.location).toEqual("/api/users/1");
     expect(response.type).toEqual("application/json");
     expect(response.body).toEqual({
-      msg: "Hello, John Doe!",
+      id: 1,
     });
   });
 });
