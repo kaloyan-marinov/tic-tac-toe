@@ -2,6 +2,7 @@ import Router from "koa-router";
 import { getConnection, Repository } from "typeorm";
 import { connectionName, INITIAL_STATE_FOR_GAME } from "./constants";
 import { Game, User } from "./entities";
+import { validateCoordinate } from "./utilities";
 
 const router = new Router();
 
@@ -64,6 +65,48 @@ router.post("/api/games", async (ctx) => {
 
   ctx.status = 201;
   ctx.set("Location", `/api/games/` + g.id);
+  ctx.body = {
+    id: g.id,
+    state: JSON.parse(g.state),
+  };
+});
+
+router.put("/api/games", async (ctx) => {
+  const gamesRepository: Repository<Game> =
+    getConnection(connectionName).getRepository(Game);
+
+  let g: Game | undefined = await gamesRepository.findOne();
+  if (g === undefined) {
+    ctx.status = 400;
+    ctx.body = {
+      error: "You aren't currently playing a game",
+    };
+    return;
+  }
+
+  if (!ctx.request.body.hasOwnProperty("x") || !ctx.request.body.hasOwnProperty("y")) {
+    ctx.status = 400;
+    ctx.body = {
+      error: "The body of your request has to specify values for 'x' and 'y'",
+    };
+    return;
+  }
+
+  const { x, y } = ctx.request.body;
+
+  if (!validateCoordinate(x) || !validateCoordinate(y)) {
+    ctx.status = 400;
+    ctx.body = {
+      error: "Each of 'x' and 'y' has to be set equal to 0, 1, or 2",
+    };
+    return;
+  }
+
+  const gameState = JSON.parse(g.state as string); // TODO: fix the entity!
+  gameState[x][y] = "marked";
+  g.state = JSON.stringify(gameState);
+  await gamesRepository.save(g);
+
   ctx.body = {
     id: g.id,
     state: JSON.parse(g.state),
