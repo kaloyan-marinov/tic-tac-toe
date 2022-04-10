@@ -5,7 +5,7 @@ import { connectionName, INITIAL_STATE_FOR_GAME } from "./constants";
 import { Game, User } from "./entities";
 import { usernameAuth } from "./middleware";
 import { IMove } from "./types";
-import { computeMoveIdx, validateCoordinate } from "./utilities";
+import { checkForWinner, computeMoveIdx, validateCoordinate } from "./utilities";
 
 const router = new Router();
 
@@ -125,6 +125,55 @@ router.put("/api/games", usernameAuth, async (ctx: Koa.Context) => {
     id: g.id,
     state: JSON.parse(g.state),
   };
+});
+
+router.get("/api/games", usernameAuth, async (ctx: Koa.Context) => {
+  const gamesRepository: Repository<Game> =
+    getConnection(connectionName).getRepository(Game);
+
+  let g: Game | undefined = await gamesRepository.findOne();
+  if (g === undefined) {
+    ctx.status = 400;
+    ctx.body = {
+      error: "You aren't currently playing a game",
+    };
+    return;
+  }
+
+  const gameState = JSON.parse(g.state as string); // TODO: fix the entity!
+
+  const winner: string | null = checkForWinner(gameState);
+
+  /*
+  const responseBody = {
+    winner,
+    id: g.id,
+    state: JSON.parse(gameState),
+  }
+
+  if (winner === null) {
+    ctx.body = responseBody;
+    return
+  } else {
+    ctx.body = {
+      winner
+      message: 
+    }
+
+    // TODO: clean up the DB
+  }
+  */
+  console.log("gameState");
+  console.log(gameState);
+  ctx.body = {
+    winner,
+    id: g.id,
+    state: gameState,
+  };
+
+  if (winner !== null) {
+    // TODO: clean up the DB
+  }
 });
 
 export { router };

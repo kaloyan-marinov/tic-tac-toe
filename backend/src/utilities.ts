@@ -30,6 +30,19 @@ export const computeMoveIdx = (gameState: TypeGameState, move: IMove): number =>
   */
 
   // Enforce that the players should take turns.
+  const stateOfLatestPlayedCell: TypeCellState = findStateOfLastPlayedCell(gameState);
+
+  if (
+    stateOfLatestPlayedCell !== null &&
+    stateOfLatestPlayedCell.username === move.username
+  ) {
+    return -1;
+  }
+
+  return stateOfLatestPlayedCell === null ? 0 : stateOfLatestPlayedCell.moveIdx + 1;
+};
+
+export const findStateOfLastPlayedCell = (gameState: TypeGameState): TypeCellState => {
   let stateOfLatestPlayedCell: TypeCellState = null;
   for (let arr of gameState) {
     for (let cellState of arr) {
@@ -44,12 +57,53 @@ export const computeMoveIdx = (gameState: TypeGameState, move: IMove): number =>
     }
   }
 
-  if (
-    stateOfLatestPlayedCell !== null &&
-    stateOfLatestPlayedCell.username === move.username
-  ) {
-    return -1;
+  return stateOfLatestPlayedCell;
+};
+
+export const checkForWinner = (gameState: TypeGameState): string | null => {
+  const stateOfLatestPlayedCell: TypeCellState = findStateOfLastPlayedCell(gameState);
+
+  if (stateOfLatestPlayedCell !== null) {
+    const { username } = stateOfLatestPlayedCell;
+
+    for (let idx of [0, 1, 2]) {
+      // Check the `idx`-th row.
+      if (
+        gameState[idx][0]?.username === username &&
+        gameState[idx][1]?.username === username &&
+        gameState[idx][2]?.username === username
+      ) {
+        return username;
+      }
+
+      // Check the `idx`-th column.
+      if (
+        gameState[0][idx]?.username === username &&
+        gameState[1][idx]?.username === username &&
+        gameState[2][idx]?.username === username
+      ) {
+        return username;
+      }
+    }
+
+    // Check the main diagonal.
+    if (
+      gameState[0][0]?.username === username &&
+      gameState[1][1]?.username === username &&
+      gameState[2][2]?.username === username
+    ) {
+      return username;
+    }
+
+    // Check the "other" diagonal.
+    if (
+      gameState[2][0]?.username === username &&
+      gameState[1][1]?.username === username &&
+      gameState[0][2]?.username === username
+    ) {
+      return username;
+    }
   }
 
-  return stateOfLatestPlayedCell === null ? 0 : stateOfLatestPlayedCell.moveIdx + 1;
+  return null;
 };

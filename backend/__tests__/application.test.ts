@@ -109,12 +109,35 @@ describe("POST /api/games", () => {
 
     const response2 = await request(server)
       .post("/api/games")
-      .send({ username: "john-doe" })
       .set("Authorization", "Bearer " + "john-doe");
 
     expect(response2.status).toEqual(201);
     expect(response2.type).toEqual("application/json");
     expect(response2.body).toEqual({
+      id: 1,
+      state: INITIAL_STATE_FOR_GAME,
+    });
+  });
+});
+
+describe("GET /api/games", () => {
+  test("should return 200", async () => {
+    const response1 = await request(server).post("/api/users").send({
+      username: "john-doe",
+    });
+
+    const response2 = await request(server)
+      .post("/api/games")
+      .set("Authorization", "Bearer " + "john-doe");
+
+    const response3 = await request(server)
+      .get("/api/games")
+      .set("Authorization", "Bearer " + "john-doe");
+
+    expect(response3.status).toEqual(200);
+    expect(response3.type).toEqual("application/json");
+    expect(response3.body).toEqual({
+      winner: null,
       id: 1,
       state: INITIAL_STATE_FOR_GAME,
     });
