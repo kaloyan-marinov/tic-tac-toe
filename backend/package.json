@@ -2,9 +2,9 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "start": "echo \"Error: no test specified\" && exit 1"
+    "serve": "ts-node src/server.ts",
+    "dev": "nodemon --watch src --ext ts --exec 'npm run serve'"
   },
   "keywords": [],
   "author": "",
