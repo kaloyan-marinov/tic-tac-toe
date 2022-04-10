@@ -92,12 +92,28 @@ describe("POST /api/users", () => {
 });
 
 describe("POST /api/games", () => {
-  test("should return 201", async () => {
+  test("if no 'username' is provided, should return 401", async () => {
     const response = await request(server).post("/api/games");
 
-    expect(response.status).toEqual(201);
+    expect(response.status).toEqual(401);
     expect(response.type).toEqual("application/json");
     expect(response.body).toEqual({
+      error: "authentication required - provide a 'username' in the request body",
+    });
+  });
+
+  test("if a valid 'username' is provided, should return 201", async () => {
+    const response1 = await request(server).post("/api/users").send({
+      username: "john-doe",
+    });
+
+    const response2 = await request(server)
+      .post("/api/games")
+      .send({ username: "john-doe" });
+
+    expect(response2.status).toEqual(201);
+    expect(response2.type).toEqual("application/json");
+    expect(response2.body).toEqual({
       id: 1,
       state: INITIAL_STATE_FOR_GAME,
     });

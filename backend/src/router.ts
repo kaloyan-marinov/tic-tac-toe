@@ -2,6 +2,7 @@ import Router from "koa-router";
 import { getConnection, Repository } from "typeorm";
 import { connectionName, INITIAL_STATE_FOR_GAME } from "./constants";
 import { Game, User } from "./entities";
+import { usernameAuth } from "./middleware";
 import { validateCoordinate } from "./utilities";
 
 const router = new Router();
@@ -55,7 +56,7 @@ router.post("/api/users", async (ctx) => {
   };
 });
 
-router.post("/api/games", async (ctx) => {
+router.post("/api/games", usernameAuth, async (ctx) => {
   const gamesRepository: Repository<Game> =
     getConnection(connectionName).getRepository(Game);
 
@@ -71,7 +72,7 @@ router.post("/api/games", async (ctx) => {
   };
 });
 
-router.put("/api/games", async (ctx) => {
+router.put("/api/games", usernameAuth, async (ctx) => {
   const gamesRepository: Repository<Game> =
     getConnection(connectionName).getRepository(Game);
 
