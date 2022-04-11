@@ -5,7 +5,7 @@ backend $ cp \
 
 # Provide values for the variables in `backend/.env`.
 
-backend $ npm run install
+backend $ npm install
 
 backend $ npm run test -- \
     --watchAll \

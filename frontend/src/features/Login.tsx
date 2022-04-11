@@ -1,18 +1,13 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
-import { ThunkDispatch } from "redux-thunk";
 import { v4 as uuidv4 } from "uuid";
 import {
-  ActionAlerts,
-  ActionFetchProfile,
-  ActionTypesIssueJWSToken,
   alertsCreate,
   fetchProfile,
   issueJWSToken,
-  IState,
   selectHasValidToken,
-} from "../types";
+} from "../store";
 
 export const Login = () => {
   const [username, setUsername] = React.useState("");

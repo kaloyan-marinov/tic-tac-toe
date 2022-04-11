@@ -88,6 +88,7 @@ router.post("/api/games", usernameAuth, async (ctx) => {
   ctx.status = 201;
   ctx.set("Location", `/api/games/` + g.id);
   ctx.body = {
+    winner: null,
     id: g.id,
     state: JSON.parse(g.state),
   };
@@ -140,7 +141,10 @@ router.put("/api/games", usernameAuth, async (ctx: Koa.Context) => {
   g.state = JSON.stringify(gameState);
   await gamesRepository.save(g);
 
+  const winner: string | null = checkForWinner(gameState);
+
   ctx.body = {
+    winner,
     id: g.id,
     state: JSON.parse(g.state),
   };
@@ -163,27 +167,6 @@ router.get("/api/games", usernameAuth, async (ctx: Koa.Context) => {
 
   const winner: string | null = checkForWinner(gameState);
 
-  /*
-  const responseBody = {
-    winner,
-    id: g.id,
-    state: JSON.parse(gameState),
-  }
-
-  if (winner === null) {
-    ctx.body = responseBody;
-    return
-  } else {
-    ctx.body = {
-      winner
-      message: 
-    }
-
-    // TODO: clean up the DB
-  }
-  */
-  console.log("gameState");
-  console.log(gameState);
   ctx.body = {
     winner,
     id: g.id,

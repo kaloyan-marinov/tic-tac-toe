@@ -114,6 +114,7 @@ describe("POST /api/games", () => {
     expect(response2.status).toEqual(201);
     expect(response2.type).toEqual("application/json");
     expect(response2.body).toEqual({
+      winner: null,
       id: 1,
       state: INITIAL_STATE_FOR_GAME,
     });

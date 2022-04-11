@@ -105,5 +105,13 @@ export const checkForWinner = (gameState: TypeGameState): string | null => {
     }
   }
 
-  return null;
+  for (let i of [0, 1, 2]) {
+    for (let j of [0, 1, 2]) {
+      if (gameState[i][j] === null) {
+        return null;
+      }
+    }
+  }
+
+  return "[OUTCOME: DRAW]";
 };

@@ -7,7 +7,7 @@ import {
   createUser,
   IState,
   selectHasValidToken,
-} from "../types";
+} from "../store";
 import { v4 as uuidv4 } from "uuid";
 import { useDispatch, useSelector } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
@@ -40,10 +40,6 @@ export const Register = () => {
       const message: string = "YOU MUST FILL OUT ALL FORM FIELDS";
       dispatch(alertsCreate(id, message));
     } else {
-      // Note to self:
-      // doing anything beyond simple `console.log` calls in this `else` clause
-      // should be postponed until
-      // after the logic within the `if` clause has been _properly_ implemented.
       try {
         await dispatch(createUser(username));
 
