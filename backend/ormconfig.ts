@@ -3,7 +3,7 @@ import path from "path";
 
 import { ConnectionOptions } from "typeorm";
 
-import { User } from "./src/entities";
+import { Game, User } from "./src/entities";
 
 config();
 
@@ -23,7 +23,7 @@ const connectionsOptions: ConnectionOptions[] = [
     type: "sqlite",
     database: DATABASE_URL,
     // entities: [path.join(__dirname), "src", "entities.ts"],
-    entities: [User],
+    entities: [User, Game],
     cli: {
       migrationsDir: "./src/migration",
     },

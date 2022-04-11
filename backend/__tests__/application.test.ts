@@ -4,7 +4,11 @@ import request from "supertest";
 import { Connection, createConnection } from "typeorm";
 
 import { app } from "../src/application";
-import { connectionName, PORT_FOR_TESTING } from "../src/constants";
+import {
+  connectionName,
+  INITIAL_STATE_FOR_GAME,
+  PORT_FOR_TESTING,
+} from "../src/constants";
 
 let connection: Connection;
 let server: http.Server;
@@ -83,6 +87,59 @@ describe("POST /api/users", () => {
     expect(response.type).toEqual("application/json");
     expect(response.body).toEqual({
       id: 1,
+    });
+  });
+});
+
+describe("POST /api/games", () => {
+  test("if no 'username' is provided, should return 401", async () => {
+    const response = await request(server).post("/api/games");
+
+    expect(response.status).toEqual(401);
+    expect(response.type).toEqual("application/json");
+    expect(response.body).toEqual({
+      error: "authentication required - via Bearer token",
+    });
+  });
+
+  test("if a valid 'username' is provided, should return 201", async () => {
+    const response1 = await request(server).post("/api/users").send({
+      username: "john-doe",
+    });
+
+    const response2 = await request(server)
+      .post("/api/games")
+      .set("Authorization", "Bearer " + "john-doe");
+
+    expect(response2.status).toEqual(201);
+    expect(response2.type).toEqual("application/json");
+    expect(response2.body).toEqual({
+      id: 1,
+      state: INITIAL_STATE_FOR_GAME,
+    });
+  });
+});
+
+describe("GET /api/games", () => {
+  test("should return 200", async () => {
+    const response1 = await request(server).post("/api/users").send({
+      username: "john-doe",
+    });
+
+    const response2 = await request(server)
+      .post("/api/games")
+      .set("Authorization", "Bearer " + "john-doe");
+
+    const response3 = await request(server)
+      .get("/api/games")
+      .set("Authorization", "Bearer " + "john-doe");
+
+    expect(response3.status).toEqual(200);
+    expect(response3.type).toEqual("application/json");
+    expect(response3.body).toEqual({
+      winner: null,
+      id: 1,
+      state: INITIAL_STATE_FOR_GAME,
     });
   });
 });
