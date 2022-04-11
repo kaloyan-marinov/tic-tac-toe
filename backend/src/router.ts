@@ -58,6 +58,25 @@ router.post("/api/users", async (ctx) => {
   };
 });
 
+router.post("/api/tokens", usernameAuth, async (ctx: Koa.Context) => {
+  ctx.body = {
+    token: ctx.username,
+  };
+});
+
+router.get("/api/user-profile", usernameAuth, async (ctx: Koa.Context) => {
+  const usersRepository: Repository<User> =
+    getConnection(connectionName).getRepository(User);
+
+  let u: User | undefined;
+  u = await usersRepository.findOne({ username: ctx.username });
+
+  ctx.body = {
+    id: u?.id,
+    username: u?.username,
+  };
+});
+
 router.post("/api/games", usernameAuth, async (ctx) => {
   const gamesRepository: Repository<Game> =
     getConnection(connectionName).getRepository(Game);

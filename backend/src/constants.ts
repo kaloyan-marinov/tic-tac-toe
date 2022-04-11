@@ -1,7 +1,7 @@
 import { TypeCellState } from "./types";
 
-export const PORT: number = 3000;
-export const PORT_FOR_TESTING: number = 3001;
+export const PORT: number = 5000;
+export const PORT_FOR_TESTING: number = 5001;
 
 export const connectionName: string =
   process.env.NODE_ENV === "test"
