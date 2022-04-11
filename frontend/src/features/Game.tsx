@@ -9,17 +9,14 @@ import {
   alertsCreate,
   createGame,
   fetchGame,
-  // IGame,
   IState,
   selectGameId,
-  // selectGameState,
   selectGameWinner,
-} from "../types";
+} from "../store";
 import { Button } from "./Button";
 
 export const Game = () => {
   const gameId = useSelector(selectGameId);
-  // const gameState = useSelector(selectGameState);
   const gameWinner = useSelector(selectGameWinner);
 
   // const dispatch: ThunkDispatch<IState, unknown, IActionClearAuthSlice | ActionAlerts> =
@@ -56,11 +53,8 @@ export const Game = () => {
     };
 
     const interval: NodeJS.Timer = setInterval(() => {
-      // console.log(`${new Date().toISOString()} - logs every second`);
       effectFn();
     }, MILLISECONDS_EQUAL_TO_1_MIN);
-
-    // effectFn();
 
     return () => {
       clearInterval(interval);
@@ -87,16 +81,6 @@ export const Game = () => {
       </React.Fragment>
     );
   }
-
-  // if () {
-  //   const alertId: string = uuidv4();
-
-  //   try {
-  //     dispatch(alertsCreate(alertId, ));
-  //   } catch (err) {
-  //     dispatch(alertsCreate(alertId, err as string));
-  //   }
-  // }
 
   return (
     <React.Fragment>

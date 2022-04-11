@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { alertsRemove, IAlert, selectAlertsEntities, selectAlertsIds } from "../types";
+import { alertsRemove, IAlert, selectAlertsEntities, selectAlertsIds } from "../store";
 
 export const Alerts = () => {
   const alertsIds: string[] = useSelector(selectAlertsIds);

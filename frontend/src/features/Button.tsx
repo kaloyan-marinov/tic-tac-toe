@@ -1,11 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import {
-  alertsCreate,
-  editGame,
-  IGame,
-  selectGameState,
-  selectGameWinner,
-} from "../types";
+import { alertsCreate, editGame, selectGameState, selectGameWinner } from "../store";
 import { v4 as uuidv4 } from "uuid";
 import { EMPTY_CONTENT } from "../constants";
 
